@@ -1,61 +1,70 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { JobModel } from '../models/jobModel';
 
 export class JobController {
-  static async createJob(req: Request, res: Response, next: NextFunction) {
+  // Create a new job
+  static createJob: RequestHandler = async (req, res, next) => {
     try {
       const newJob = await JobModel.create(req.body);
+      // No 'return' in front of res
       res.status(201).json(newJob);
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  static async getAllJobs(req: Request, res: Response, next: NextFunction) {
+  // Retrieve all jobs
+  static getAllJobs: RequestHandler = async (req, res, next) => {
     try {
       const jobs = await JobModel.findAll();
       res.status(200).json(jobs);
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  static async getJobById(req: Request, res: Response, next: NextFunction) {
+  // Retrieve a specific job by ID
+  static getJobById: RequestHandler = async (req, res, next) => {
     try {
       const { id } = req.params;
       const job = await JobModel.findById(Number(id));
       if (!job) {
-        return res.status(404).json({ message: 'Job not found' });
+        res.status(404).json({ message: 'Job not found' });
+        return;
       }
       res.status(200).json(job);
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  static async updateJob(req: Request, res: Response, next: NextFunction) {
+  // Update a job by ID
+  static updateJob: RequestHandler = async (req, res, next) => {
     try {
       const { id } = req.params;
       const updatedJob = await JobModel.update(Number(id), req.body);
       if (!updatedJob) {
-        return res.status(404).json({ message: 'Job not found' });
+        res.status(404).json({ message: 'Job not found' });
+        return;
       }
       res.status(200).json(updatedJob);
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  static async deleteJob(req: Request, res: Response, next: NextFunction) {
+  // Delete a job by ID
+  static deleteJob: RequestHandler = async (req, res, next) => {
     try {
       const { id } = req.params;
       const success = await JobModel.delete(Number(id));
       if (!success) {
-        return res.status(404).json({ message: 'Job not found' });
+        res.status(404).json({ message: 'Job not found' });
+        return;
       }
-      res.status(204).send();
+      res.status(204).send(); // No content
     } catch (error) {
       next(error);
     }
-  }
+  };
 }
